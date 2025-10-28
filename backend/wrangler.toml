@@ -1,0 +1,22 @@
+name = "client-database-api"
+main = "src/index.js"
+compatibility_date = "2025-10-27"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+ENVIRONMENT = "production"
+JWT_SECRET = "your-super-secret-jwt-key-change-this-in-production"
+ENCRYPTION_KEY = "your-32-byte-encryption-key-here-change-this"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "client-database"
+database_id = "64411c14-9bf5-4d7e-a338-62eb545d66bb"  # Replace with actual ID from wrangler d1 create
+
+[[r2_buckets]]
+binding = "FILES"
+bucket_name = "client-files"
+
+[[kv_namespaces]]
+binding = "CACHE"
+id = "bed7d360fc9042f7a37783635581d757"  # We'll create this next

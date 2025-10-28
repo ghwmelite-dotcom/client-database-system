@@ -1,0 +1,19 @@
+{
+  "name": "client-database-api",
+  "version": "1.0.0",
+  "description": "Client Database API with Cloudflare Workers",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "wrangler d1 execute client-database --command=\"SELECT * FROM clients LIMIT 5;\""
+  },
+  "dependencies": {
+    "hono": "^3.11.7",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "wrangler": "^3.17.1"
+  }
+}
