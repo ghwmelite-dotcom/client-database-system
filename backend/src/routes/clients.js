@@ -280,7 +280,10 @@ export function createClientRoutes(encryption, db) {
       return new Response(csv, {
         headers: {
           'Content-Type': 'text/csv',
-          'Content-Disposition': `attachment; filename="clients-${Date.now()}.csv"`
+          'Content-Disposition': `attachment; filename="clients-${Date.now()}.csv"`,
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
         }
       });
     } catch (error) {
