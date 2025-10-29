@@ -256,11 +256,25 @@ export function createClientRoutes(encryption, db) {
 
       const { results } = await db.prepare(query).bind(...bindings).all();
 
-      // Generate CSV
-      let csv = 'ID,First Name,Last Name,Telephone,Email,Address,City,State,ZIP,Date of Birth,Status,Created At\n';
-      
+      // Generate CSV with SSN and Notes
+      let csv = 'ID,First Name,Last Name,Telephone,Email,Address,City,State,ZIP,Date of Birth,SSN,Status,Notes,Created At\n';
+
       for (const client of results) {
-        csv += `${client.id},"${client.first_name}","${client.last_name}","${client.telephone}","${client.email || ''}","${client.address || ''}","${client.city || ''}","${client.state || ''}","${client.zip_code || ''}","${client.date_of_birth}","${client.status}","${client.created_at}"\n`;
+        // Decrypt SSN for export (full SSN - masked for security)
+        const decryptedSSN = await encryption.decrypt(client.social_security_number);
+        const maskedSSN = `***-**-${decryptedSSN.slice(-4)}`;
+
+        // Fetch all notes for this client
+        const { results: notes } = await db.prepare(
+          'SELECT note_text, note_type, created_at FROM notes WHERE client_id = ? ORDER BY created_at DESC'
+        ).bind(client.id).all();
+
+        // Combine notes into a single field with type and date
+        const notesText = notes.map(n =>
+          `[${n.note_type.toUpperCase()}] ${n.note_text} (${n.created_at})`
+        ).join(' | ');
+
+        csv += `${client.id},"${client.first_name}","${client.last_name}","${client.telephone}","${client.email || ''}","${client.address || ''}","${client.city || ''}","${client.state || ''}","${client.zip_code || ''}","${client.date_of_birth}","${maskedSSN}","${client.status}","${notesText.replace(/"/g, '""')}","${client.created_at}"\n`;
       }
 
       return new Response(csv, {
